@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace MediatRTry
 {
@@ -37,14 +38,33 @@ namespace MediatRTry
             services.AddMediatR();
 
             services
-                .AddMvc()
+                .AddMvc(options => options.Filters.Add(typeof(CustomExceptionFilterAttribute)))
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddFluentValidation();
+
+            AssemblyScanner.FindValidatorsInAssemblyContaining<Startup>().ForEach(pair => {
+                // RegisterValidatorsFromAssemblyContaing does this:
+                services.Add(ServiceDescriptor.Transient(pair.InterfaceType, pair.ValidatorType));
+                // Also register it as its concrete type as well as the interface type
+                services.Add(ServiceDescriptor.Transient(pair.ValidatorType, pair.ValidatorType));
+            });
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title="My API", Version="v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseSwagger()
+                .UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MediatR V1");
+                });
+
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

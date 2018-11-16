@@ -18,22 +18,21 @@ namespace MediatRTry.Infrastructure
             _validators = validators;
         }
 
-        public Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
-            var context = new ValidationContext(request);
-
             var failures = _validators
-                .Select(v => v.Validate(context))
+                .Select(v => v.Validate(request))
                 .SelectMany(result => result.Errors)
-                .Where(f => f != null)
+                .Where(error => error != null)
                 .ToList();
 
             if (failures.Any())
             {
-                throw new Exception($"Command Validation Errors for type {typeof(TRequest).Name}", new ValidationException("Validation exception", failures));
+                throw new ValidationException($"Command Validation Errors for type {typeof(TRequest).Name}", failures);
             }
 
-            return next();
+            var response = await next();
+            return response;
         }
     }
 }

@@ -1,9 +1,5 @@
-﻿using FluentValidation;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,14 +42,6 @@ namespace MediatRTry
         public async Task Handle(SomeEvent notification, CancellationToken cancellationToken)
         {
             await Task.Run(() => _logger.LogWarning($"Notification Handled by Handler2: {notification.Message}"));
-        }
-    }
-
-    public class SomeEventCommandValidator : AbstractValidator<SomeEvent>
-    {
-        public SomeEventCommandValidator()
-        {
-            RuleFor(x => x.Message).MaximumLength(5).NotEmpty();
         }
     }
 }

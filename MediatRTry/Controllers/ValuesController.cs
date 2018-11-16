@@ -18,18 +18,19 @@ namespace MediatRTry.Controllers
             this._mediator = mediator;
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(string id)
-        {
-            return Ok(await _mediator.Send(new Ping(id)));
-        }
-
         // POST api/values
         [HttpPost]
-        public async Task Post([FromBody]SomeEvent value)
+        //public async Task<IActionResult> Post([FromBody]SomeEvent value)
+        //public async Task<IActionResult> Post([FromBody]PingCommand value)
+        public async Task<IActionResult> Post([FromBody]DataViewModel value)
         {
-            await _mediator.Publish(value);
+            await _mediator.Publish(new SomeEvent(value.Message));
+            return Ok(await _mediator.Send(new PingCommand(value.Message)));
         }
+    }
+
+    public class DataViewModel
+    {
+        public string Message { get; set; }
     }
 }
