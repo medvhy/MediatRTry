@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace MediatRTry
 {
+    //Request are used to execute commands being the Command part of the CQRS
     public class PingCommand : IRequest<string>
     {
         public PingCommand(string message)

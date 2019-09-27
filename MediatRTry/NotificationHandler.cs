@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace MediatRTry
 {
+    //Notifications are used to advice other domain entities when a domain event was raised
     public class SomeEvent : INotification
     {
         public SomeEvent(string message)
